@@ -73,6 +73,11 @@
   :type 'list
   :group 'eaf-pdf-viewer)
 
+(defcustom eaf-pdf-history-filter-pattern "^\\(.+\\)\\.pdf$"
+  "Regular expression to filter the EAF PDF history."
+  :type 'string
+  :group 'eaf-pdf-viewer)
+
 (defcustom eaf-pdf-store-history t
   "If it is t, the pdf file path will be stored in eaf-config-location/pdf/history/log.txt for eaf-open-pdf-from-history to use"
   :type 'boolean
@@ -524,7 +529,6 @@ This function works best if paired with a fuzzy search package."
                   (file-name-as-directory "pdf")
                   (file-name-as-directory "history")
                   "log.txt"))
-         (history-pattern "^\\(.+\\)\\.pdf$")
          (history-file-exists (file-exists-p pdf-history-file-path))
          (eaf-files-opened (mapcar (lambda (buf)
                                      (buffer-local-value 'eaf--buffer-url buf))
@@ -536,7 +540,7 @@ This function works best if paired with a fuzzy search package."
                                            (member x eaf-files-opened)))
                                      (if history-file-exists
                                          (mapcar
-                                          (lambda (h) (when (string-match history-pattern h)
+                                          (lambda (h) (when (string-match eaf-pdf-history-filter-pattern h)
                                                         (if (file-exists-p h)
                                                             (format "%s" h))))
                                           (with-temp-buffer (insert-file-contents pdf-history-file-path)
@@ -553,7 +557,6 @@ This function works best if paired with a fuzzy search package."
                   (file-name-as-directory "pdf")
                   (file-name-as-directory "history")
                   "log.txt"))
-         (history-pattern "^\\(.+\\)\\.pdf$")
          (history-file-exists (file-exists-p pdf-history-file-path))
          file-content)
     (when history-file-exists
